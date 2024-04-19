@@ -126,17 +126,19 @@ contract Voting is Ownable {
         emit ProposalRegistered(proposalCounter);
     }
 
-    function vote(uint proposalNumber) onlyRegistered public {
+    function vote(uint proposalId) onlyRegistered public {
         if (currentWorkflowStatus != WorkflowStatus.votingSessionStarted)
             revert("The admin did not start the voting session or it's too late");
         if (voterList[msg.sender].hasVoted)
             revert("You have already voted");
+        if (proposalId == 0 || proposalId > proposalCounter)
+            revert("The proposal you specified does not exist");
 
-        proposals[proposalNumber].voteCount++;
+        proposals[proposalId].voteCount++;
         voterList[msg.sender].hasVoted = true;
-        voterList[msg.sender].votedProposalId = proposalNumber;
+        voterList[msg.sender].votedProposalId = proposalId;
 
-        emit Voted(msg.sender, proposalNumber);
+        emit Voted(msg.sender, proposalId);
     }
 
     function getWinner() public view returns (Proposal memory) {
